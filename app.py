@@ -33,41 +33,73 @@ tab1, tab2, tab3 = st.tabs([
 ])
 
 # -------------------------------------------------------------
-# TAB 1: Model 1 - แบบสอบถามประเมินความเสี่ยงโรคไต
+# TAB 1: Model 1 - แบบสอบถามประเมินความเสี่ยงโรคไต (25 ข้อ)
 # -------------------------------------------------------------
 with tab1:
-    st.subheader("แบบประเมินความเสี่ยงโรคไตวายเรื้อรังเบื้องต้น")
-    st.write("กรุณาตอบคำถามด้านล่างเพื่อให้ AI ประเมินความเสี่ยงของท่าน")
+    st.subheader("แบบประเมินความเสี่ยงโรคไตวายเรื้อรัง (25 คำถาม)")
+    st.write("กรุณาตอบคำถามตามความเป็นจริงเพื่อความแม่นยำในการวิเคราะห์ของ AI")
     
-    # ตัวเลือก 3 ระดับ
     options = ["ไม่ใช่", "ไม่แน่ใจ", "ใช่"]
-    
-    # ตัวแปลงคำตอบเป็นตัวเลขสำหรับ AI
     val_map = {"ไม่ใช่": 0.0, "ไม่แน่ใจ": 0.5, "ใช่": 1.0}
 
-    age = st.number_input("อายุของคุณ (ปี)", min_value=1, max_value=120, value=25)
-    
-    # เปลี่ยนจากความดันเป็นพฤติกรรมการกินอาหารเค็ม/แปรรูป
-    salty_food = st.radio("ท่านทานอาหารรสเค็มจัด อาหารหมักดอง หรืออาหารแปรรูป (บะหมี่สำเร็จรูป, ไส้กรอก) เป็นประจำหรือไม่?", options)
-    diabetes = st.radio("ท่านเป็นโรคเบาหวาน หรือมีประวัติคนในครอบครัวเป็นเบาหวานหรือไม่?", options)
-    swelling = st.radio("ท่านมีอาการหน้าบวม ขาบวม หรือกดบุ๋มแล้วคืนตัวช้าหรือไม่?", options)
-    foamy = st.radio("ปัสสาวะของท่านมีฟองมากเป็นประจำหรือไม่?", options)
-    low_water = st.radio("ท่านดื่มน้ำน้อยกว่า 1.5 ลิตรต่อวัน (ประมาณ 6-8 แก้ว) เป็นประจำหรือไม่?", options)
+    # ---------------- หมวดที่ 1 ----------------
+    st.markdown("#### 🥗 หมวดที่ 1: พฤติกรรมการกินและโภชนาการ (8 ข้อ)")
+    age = st.number_input("1. อายุของคุณ (ปี)", min_value=1, max_value=120, value=25)
+    salty_food = st.radio("2. ทานอาหารรสเค็มจัด หรือซดน้ำซุป/น้ำจิ้มหมดถ้วยเป็นประจำ?", options, key="q2")
+    sweet_drinks = st.radio("3. ดื่มน้ำหวาน ชานม หรือน้ำอัดลมมากกว่า 1 แก้ว/วัน เป็นประจำ?", options, key="q3")
+    processed_snack = st.radio("4. ทานอาหารแปรรูป ขนมขบเคี้ยว หรืออาหารบะหมี่สำเร็จรูปบ่อยครั้ง?", options, key="q4")
+    low_water = st.radio("5. ดื่มน้ำสะอาดน้อยกว่า 1.5 ลิตร (ประมาณ 6-8 แก้ว) ต่อวัน?", options, key="q5")
+    high_fat_diet = st.radio("6. ชอบทานอาหารติดมัน ของทอด หรืออาหารกะทิเป็นประจำ?", options, key="q6")
+    alcohol = st.radio("7. ดื่มเครื่องดื่มแอลกอฮอล์เป็นประจำ (มากกว่า 2-3 ครั้ง/สัปดาห์)?", options, key="q7")
+    nsaids = st.radio("8. ทานยาทานแก้ปวดชุด ยาสมุนไพร หรือยาแก้ปวดแก้อักเสบ (NSAIDs) ติดต่อกันนาน?", options, key="q8")
 
-    if st.button("คำนวณระดับความเสี่ยง"):
-        # แปลงคำตอบของผู้ใช้เป็นค่าตัวเลข (0.0, 0.5, 1.0)
-        # Convert user inputs to DataFrame with feature names
-        inputs = pd.DataFrame([[
-            age, 
-            val_map[salty_food],
-            val_map[diabetes],
-            val_map[swelling],
-            val_map[foamy],
-            val_map[low_water]
-        ]], columns=['age', 'salty_food', 'diabetes', 'swelling', 'foamy_urine', 'low_water'])
+    st.divider()
+
+    # ---------------- หมวดที่ 2 ----------------
+    st.markdown("#### 🩺 หมวดที่ 2: อาการและสัญญาณเตือนทางร่างกาย (9 ข้อ)")
+    swelling = st.radio("9. มีอาการหน้าบวม ขาบวม หรือกดบริเวณหลังเท้าแล้วบุ๋มไม่คืนตัว?", options, key="q9")
+    foamy = st.radio("10. ปัสสาวะมีฟองมาก ฟองหนา และไม่ยุบตัวหายไปเอง?", options, key="q10")
+    fatigue = st.radio("11. รู้สึกอ่อนเพลีย เหนื่อยง่าย ไม่มีแรง โดยไม่ทราบสาเหตุ?", options, key="q11")
+    nocturia = st.radio("12. ตื่นขึ้นมาปัสสาวะกลางดึกมากกว่า 2 ครั้งเป็นประจำ?", options, key="q12")
+    skin_itching = st.radio("13. มีอาการผิวแห้ง คันตามร่างกายอย่างรุนแรงโดยไม่มีผื่น?", options, key="q13")
+    flank_pain = st.radio("14. รู้สึกปวดหลังหรือปวดเอวบริเวณข้างลำตัวอย่างต่อเนื่อง?", options, key="q14")
+    muscle_cramps = st.radio("15. เป็นตะคริวบ่อยครั้ง โดยเฉพาะในเวลากลางคืน?", options, key="q15")
+    loss_of_appetite = st.radio("16. รู้สึกเบื่ออาหาร คลื่นไส้ หรืออาเจียนในตอนเช้า?", options, key="q16")
+    shortness_of_breath = st.radio("17. รู้สึกหายใจติดขัด หรือเหนื่อยหอบง่ายเมื่อออกแรงเล็กน้อย?", options, key="q17")
+
+    st.divider()
+
+    # ---------------- หมวดที่ 3 ----------------
+    st.markdown("#### 🧬 หมวดที่ 3: ประวัติสุขภาพและสไตล์การดำเนินชีวิต (8 ข้อ)")
+    metallic_taste = st.radio("18. รู้สึกรสชาติอาหารเปลี่ยนไป หรือลมหายใจมีกลิ่นแปลกๆ (คล้ายยูเรีย)?", options, key="q18")
+    diabetes = st.radio("19. มีประวัติเป็นโรคเบาหวาน หรือคุมระดับน้ำตาลในเลือดไม่ได้?", options, key="q19")
+    high_bp = st.radio("20. มีภาวะความดันโลหิตสูง หรือต้องทานยาความดันเป็นประจำ?", options, key="q20")
+    family_ckd = st.radio("21. มีญาติสายตรง (พ่อ แม่ พี่ น้อง) มีประวัติเป็นโรคไต?", options, key="q21")
+    gout = st.radio("22. เคยได้รับวินิจฉัยว่าเป็นโรคเกาต์ หรือมีกรดยูริกในเลือดสูง?", options, key="q22")
+    smoking = st.radio("23. สูบบุหรี่ หรือได้รับควันบุหรี่มือสองเป็นประจำ?", options, key="q23")
+    exercise = st.radio("24. นั่งทำงานนานๆ และขาดการออกกำลังกาย (น้อยกว่า 150 นาที/สัปดาห์)?", options, key="q24")
+    sleep_problems = st.radio("25. มีปัญหาเกี่ยวกับการนอน เช่น นอนไม่หลับ หรือสะดุ้งตื่นบ่อย?", options, key="q25")
+
+    st.divider()
+
+    if st.button("คำนวณระดับความเสี่ยง (AI Analytics)", use_container_width=True):
+        # รวมข้อมูลทั้ง 25 ข้อเข้า Pandas DataFrame ให้ตรงกับ Model
+        input_data = pd.DataFrame([[
+            age, val_map[salty_food], val_map[sweet_drinks], val_map[processed_snack], val_map[low_water],
+            val_map[high_fat_diet], val_map[alcohol], val_map[nsaids], val_map[swelling], val_map[foamy],
+            val_map[fatigue], val_map[nocturia], val_map[skin_itching], val_map[flank_pain], val_map[muscle_cramps],
+            val_map[loss_of_appetite], val_map[shortness_of_breath], val_map[metallic_taste], val_map[diabetes], val_map[high_bp],
+            val_map[family_ckd], val_map[gout], val_map[smoking], val_map[exercise], val_map[sleep_problems]
+        ]], columns=[
+            'age', 'salty_food', 'sweet_drinks', 'processed_snack', 'low_water', 
+            'high_fat_diet', 'alcohol', 'nsaids', 'swelling', 'foamy_urine', 
+            'fatigue', 'nocturia', 'skin_itching', 'flank_pain', 'muscle_cramps', 
+            'loss_of_appetite', 'shortness_of_breath', 'metallic_taste', 'diabetes', 'high_bp', 
+            'family_ckd', 'gout', 'smoking', 'exercise', 'sleep_problems'
+        ])
         
         if risk_model:
-            prob = risk_model.predict_proba(inputs)[0][1] * 100
+            prob = risk_model.predict_proba(input_data)[0][1] * 100
             st.session_state['risk_score'] = prob
             
             if prob >= 50:
