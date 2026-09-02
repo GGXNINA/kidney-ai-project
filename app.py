@@ -39,23 +39,32 @@ with tab1:
     st.subheader("แบบประเมินความเสี่ยงโรคไตวายเรื้อรังเบื้องต้น")
     st.write("กรุณาตอบคำถามด้านล่างเพื่อให้ AI ประเมินความเสี่ยงของท่าน")
     
+    # ตัวเลือก 3 ระดับ
+    options = ["ไม่ใช่", "ไม่แน่ใจ", "ใช่"]
+    
+    # ตัวแปลงคำตอบเป็นตัวเลขสำหรับ AI
+    val_map = {"ไม่ใช่": 0.0, "ไม่แน่ใจ": 0.5, "ใช่": 1.0}
+
     age = st.number_input("อายุของคุณ (ปี)", min_value=1, max_value=120, value=25)
-    high_bp = st.radio("ท่านมีภาวะความดันโลหิตสูงหรือไม่?", ["ไม่ใช่", "ใช่"])
-    diabetes = st.radio("ท่านเป็นโรคเบาหวานหรือไม่?", ["ไม่ใช่", "ใช่"])
-    swelling = st.radio("ท่านมีอาการหน้าบวม ขาบวม หรือกดบุ๋มหรือไม่?", ["ไม่ใช่", "ใช่"])
-    foamy = st.radio("ปัสสาวะของท่านมีฟองมากเป็นประจำหรือไม่?", ["ไม่ใช่", "ใช่"])
-    low_water = st.radio("ท่านดื่มน้ำน้อยกว่า 1.5 ลิตรต่อวันเป็นประจำหรือไม่?", ["ไม่ใช่", "ใช่"])
+    
+    # เปลี่ยนจากความดันเป็นพฤติกรรมการกินอาหารเค็ม/แปรรูป
+    salty_food = st.radio("ท่านทานอาหารรสเค็มจัด อาหารหมักดอง หรืออาหารแปรรูป (บะหมี่สำเร็จรูป, ไส้กรอก) เป็นประจำหรือไม่?", options)
+    diabetes = st.radio("ท่านเป็นโรคเบาหวาน หรือมีประวัติคนในครอบครัวเป็นเบาหวานหรือไม่?", options)
+    swelling = st.radio("ท่านมีอาการหน้าบวม ขาบวม หรือกดบุ๋มแล้วคืนตัวช้าหรือไม่?", options)
+    foamy = st.radio("ปัสสาวะของท่านมีฟองมากเป็นประจำหรือไม่?", options)
+    low_water = st.radio("ท่านดื่มน้ำน้อยกว่า 1.5 ลิตรต่อวัน (ประมาณ 6-8 แก้ว) เป็นประจำหรือไม่?", options)
 
     if st.button("คำนวณระดับความเสี่ยง"):
-        # แปลงข้อมูลอินพุตเป็นรูปแบบตัวเลขสำหรับ Model
-        inputs = np.array([[
+        # แปลงคำตอบของผู้ใช้เป็นค่าตัวเลข (0.0, 0.5, 1.0)
+        # Convert user inputs to DataFrame with feature names
+        inputs = pd.DataFrame([[
             age, 
-            1 if high_bp == "ใช่" else 0,
-            1 if diabetes == "ใช่" else 0,
-            1 if swelling == "ใช่" else 0,
-            1 if foamy == "ใช่" else 0,
-            1 if low_water == "ใช่" else 0
-        ]])
+            val_map[salty_food],
+            val_map[diabetes],
+            val_map[swelling],
+            val_map[foamy],
+            val_map[low_water]
+        ]], columns=['age', 'salty_food', 'diabetes', 'swelling', 'foamy_urine', 'low_water'])
         
         if risk_model:
             prob = risk_model.predict_proba(inputs)[0][1] * 100
